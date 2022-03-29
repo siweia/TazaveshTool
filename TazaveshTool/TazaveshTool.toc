@@ -4,5 +4,6 @@
 ## Author: Siweia
 ## Version: 1
 ## X-Support: SL
+## SavedVariables: TTdb
 
 TradeGoods.lua

@@ -1,10 +1,13 @@
 local _, ns = ...
 
+TTdb = TTdb or {}
+
 local mult = 1/8
 local NUMBER_DOTS_TEXTURE = "Interface\\Worldmap\\UI-QuestPoi-NumberIcons"
 local unitIDs = {"player", "party1", "party2", "party3", "party4"}
 local cache = {}
 
+-- 商人坐标及属性
 local NUMBER_MAPS = {
 	[1] = {-35, 45, "外环左上角，裁缝商人。"},
 	[2] = {72, 55, "外环右上角，武器商人。"},
@@ -17,6 +20,7 @@ local NUMBER_MAPS = {
 	[9] = {-10, -40, "内环下方，炼金商人。"},
 }
 
+-- 法术ID对应的商人索引
 local spellToIndex = {
 	-- 赛·阿其达，裁缝
 	[352127] = 1, -- 布料
@@ -57,6 +61,7 @@ local spellToIndex = {
 	--[118922] = 9,
 }
 
+-- 创建数字图标按钮
 local function GetNumberTexCoord(n)
 	local x = (n-1)%8 * mult
 	local y = n < 9 and 0 or mult
@@ -87,6 +92,7 @@ local function onClick(bu)
 	SendChatMessage(NUMBER_MAPS[bu.__idx][3], IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY")
 end
 
+-- 地图面板
 local f = CreateFrame("Frame", "Tazavesh_TradeMaps", UIParent)
 f:SetSize(200, 200)
 f:SetPoint("RIGHT", -300, 0)
@@ -112,6 +118,7 @@ for index, value in pairs(NUMBER_MAPS) do
 	buttons[index] = bu
 end
 
+-- 创建旋转按钮
 local RAD_MAPS = {0, 90, 180, -90}
 
 local function GetRotateAnchor(x, y, index)
@@ -126,6 +133,13 @@ local function GetRotateAnchor(x, y, index)
 	end
 end
 
+local function StartRotation()
+	tex:SetRotation(rad(RAD_MAPS[TTdb.RotateIndex]))
+	for i = 1, 9 do
+		buttons[i]:SetPoint("CENTER", GetRotateAnchor(NUMBER_MAPS[i][1], NUMBER_MAPS[i][2], TTdb.RotateIndex))
+	end
+end
+
 local rotate = CreateFrame("Button", nil, f)
 rotate:SetPoint("TOPLEFT", 0, 25)
 rotate:SetSize(25, 25)
@@ -133,20 +147,49 @@ rotate.tex = rotate:CreateTexture()
 rotate.tex:SetAllPoints()
 rotate.tex:SetTexture("Interface\\Buttons\\UI-RefreshButton")
 rotate.tex:SetTexCoord(1, 0, 0, 1)
-rotate:SetScript("OnClick", function(self)
-	self.index = (self.index or 1) + 1
-	if self.index == 5 then self.index = 1 end
-	tex:SetRotation(rad(RAD_MAPS[self.index]))
+rotate:SetScript("OnClick", function()
+	TTdb.RotateIndex = TTdb.RotateIndex + 1
+	if TTdb.RotateIndex == 5 then TTdb.RotateIndex = 1 end
+	StartRotation()
+end)
 
-	for i = 1, 9 do
-		buttons[i]:SetPoint("CENTER", GetRotateAnchor(NUMBER_MAPS[i][1], NUMBER_MAPS[i][2], self.index))
-	end
+-- 创建喊话开关
+local notify = CreateFrame("Button", nil, f)
+notify:SetSize(25, 25)
+notify:SetPoint("LEFT", rotate, "RIGHT", 10, 0)
+notify.tex = notify:CreateTexture()
+notify.tex:SetAllPoints()
+notify.tex:SetTexture("Interface\\COMMON\\VOICECHAT-SPEAKER")
+local slash = notify:CreateTexture()
+slash:SetSize(20, 3)
+slash:SetColorTexture(1, 0, 0)
+slash:SetPoint("CENTER")
+slash:SetRotation(rad(-45))
+
+local function UpdateSlashState()
+	slash:SetShown(not TTdb.NotifyAnchor)
+end
+
+notify:SetScript("OnClick", function()
+	TTdb.NotifyAnchor = not TTdb.NotifyAnchor
+	UpdateSlashState()
 end)
 
 local eventFrame = CreateFrame("Frame")
+eventFrame:RegisterEvent("PLAYER_LOGIN")
 eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 eventFrame:SetScript("OnEvent", function(_, event)
-	if event == "PLAYER_ENTERING_WORLD" then
+	if event == "PLAYER_LOGIN" then
+		-- default variable
+		if TTdb.RotateIndex == nil then
+			TTdb.RotateIndex = 1
+		end
+		if TTdb.NotifyAnchor == nil then
+			TTdb.NotifyAnchor = true
+		end
+		StartRotation()
+		UpdateSlashState()
+	elseif event == "PLAYER_ENTERING_WORLD" then
 		local instID = select(8, GetInstanceInfo())
 		if instID == 2441 then
 			eventFrame:RegisterEvent("UNIT_AURA")
@@ -172,11 +215,14 @@ eventFrame:SetScript("OnEvent", function(_, event)
 						buttons[index].bg:SetDesaturated(false)
 						buttons[index].bg:SetAlpha(1)
 
-						local now = GetTime()
-						if not cache[spellID] or cache[spellID] - now > 120 then
-							cache[spellID] = now
-							onClick(buttons[index])
+						if TTdb.NotifyAnchor then
+							local now = GetTime()
+							if not cache[spellID] or cache[spellID] - now > 120 then
+								cache[spellID] = now
+								onClick(buttons[index])
+							end
 						end
+
 						f:Show()
 						return
 					end
