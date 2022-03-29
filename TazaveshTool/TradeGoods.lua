@@ -107,7 +107,7 @@ f:SetScript("OnDragStop", function() f:StopMovingOrSizing() end)
 local tex = f:CreateTexture()
 tex:SetAllPoints()
 tex:SetTexture("Interface\\Addons\\TazaveshTool\\Media\\TAZAVESH")
---f:Hide()
+f:Hide()
 
 local buttons = {}
 for index, value in pairs(NUMBER_MAPS) do
@@ -197,7 +197,7 @@ eventFrame:SetScript("OnEvent", function(_, event)
 			eventFrame:UnregisterEvent("UNIT_AURA")
 		end
 	elseif event == "UNIT_AURA" then
-		--f:Hide()
+		f:Hide()
 		for i = 1, 9 do
 			buttons[i].bg:SetDesaturated(true)
 			buttons[i].bg:SetAlpha(.5)
