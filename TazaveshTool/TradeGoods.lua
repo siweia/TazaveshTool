@@ -6,15 +6,15 @@ local unitIDs = {"player", "party1", "party2", "party3", "party4"}
 local cache = {}
 
 local NUMBER_MAPS = {
-	[1] = {50, -40, "外环左上角，裁缝商人。"},
-	[2] = {157, -30, "外环右上角，武器商人。"},
-	[3] = {157, -87, "外环右侧，宝石商人。"},
-	[4] = {125, -150, "外环右下角，料理商人。"},
-	[5] = {55, -160, "外环左下角，化石商人"},
-	[6] = {20, -120, "外环左侧，乐器商人。"},
-	[7] = {75, -70, "内环上方，文书商人。"},
-	[8] = {45, -95, "内环左侧，香料商人。"},
-	[9] = {75, -125, "内环下方，炼金商人。"},
+	[1] = {-35, 45, "外环左上角，裁缝商人。"},
+	[2] = {72, 55, "外环右上角，武器商人。"},
+	[3] = {72, -2, "外环右侧，宝石商人。"},
+	[4] = {40, -65, "外环右下角，料理商人。"},
+	[5] = {-30, -75, "外环左下角，化石商人"},
+	[6] = {-65, -35, "外环左侧，乐器商人。"},
+	[7] = {-10, 15, "内环上方，文书商人。"},
+	[8] = {-40, -10, "内环左侧，香料商人。"},
+	[9] = {-10, -40, "内环下方，炼金商人。"},
 }
 
 local spellToIndex = {
@@ -101,16 +101,47 @@ f:SetScript("OnDragStop", function() f:StopMovingOrSizing() end)
 local tex = f:CreateTexture()
 tex:SetAllPoints()
 tex:SetTexture("Interface\\Addons\\TazaveshTool\\Media\\TAZAVESH")
-f:Hide()
+--f:Hide()
 
 local buttons = {}
 for index, value in pairs(NUMBER_MAPS) do
 	local bu = AddNewNumber(f, index)
-	bu:SetPoint("TOPLEFT", value[1], value[2])
+	bu:SetPoint("CENTER", tex, value[1], value[2])
 	bu.__idx = index
 	bu:SetScript("OnClick", onClick)
 	buttons[index] = bu
 end
+
+local RAD_MAPS = {0, 90, 180, -90}
+
+local function GetRotateAnchor(x, y, index)
+	if index == 1 then
+		return x, y
+	elseif index == 2 then
+		return -y, x
+	elseif index == 3 then
+		return -x, -y
+	elseif index == 4 then
+		return y, -x
+	end
+end
+
+local rotate = CreateFrame("Button", nil, f)
+rotate:SetPoint("TOPLEFT", 0, 25)
+rotate:SetSize(25, 25)
+rotate.tex = rotate:CreateTexture()
+rotate.tex:SetAllPoints()
+rotate.tex:SetTexture("Interface\\Buttons\\UI-RefreshButton")
+rotate.tex:SetTexCoord(1, 0, 0, 1)
+rotate:SetScript("OnClick", function(self)
+	self.index = (self.index or 1) + 1
+	if self.index == 5 then self.index = 1 end
+	tex:SetRotation(rad(RAD_MAPS[self.index]))
+
+	for i = 1, 9 do
+		buttons[i]:SetPoint("CENTER", GetRotateAnchor(NUMBER_MAPS[i][1], NUMBER_MAPS[i][2], self.index))
+	end
+end)
 
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -123,7 +154,7 @@ eventFrame:SetScript("OnEvent", function(_, event)
 			eventFrame:UnregisterEvent("UNIT_AURA")
 		end
 	elseif event == "UNIT_AURA" then
-		f:Hide()
+		--f:Hide()
 		for i = 1, 9 do
 			buttons[i].bg:SetDesaturated(true)
 			buttons[i].bg:SetAlpha(.5)
