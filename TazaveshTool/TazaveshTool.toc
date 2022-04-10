@@ -2,7 +2,7 @@
 ## Title: |cff0080ffTazaveshTool|r
 ## Title-zhCN: |cff0080ffTazaveshTool|r 集市交易助手
 ## Author: Siweia
-## Version: 2
+## Version: 3
 ## X-Support: SL
 ## SavedVariables: TTdb
 ## X-Website: https://github.com/siweia/TazaveshTool
