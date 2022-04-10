@@ -8,3 +8,4 @@
 ## X-Website: https://github.com/siweia/TazaveshTool
 
 TradeGoods.lua
+RunesNotification.lua
