@@ -9,7 +9,7 @@ local orders = {1, 2, 4, 3}
 local iconString = "|T%s:16:16:0:0:64:64:5:59:5:59|t %s"
 local ticks = 0
 
-local triggerSpell = 346427 -- 触发法术
+local TRIGGER_SPELL = 346427 -- 触发法术
 local BOSS_ID = 2426 -- 希尔布兰德
 local width = 200
 local spacing, iconSpacing = 30, 1
@@ -140,6 +140,8 @@ send:SetScript("OnClick", function()
 	SendChatMessage(text, IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY")
 end)
 
+local lastShown = 0
+
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 eventFrame:SetScript("OnEvent", function(_, event, arg1)
@@ -159,11 +161,17 @@ eventFrame:SetScript("OnEvent", function(_, event, arg1)
 	elseif event == "UNIT_AURA" then
 		f:Hide()
 
+		local now = GetTime()
 		for i = 1, 40 do
 			local name, _, _, _, _, _, _, _, _, spellID = UnitBuff("player", i)
 			if not name then break end
-			if spellID == triggerSpell then
+			if spellID == TRIGGER_SPELL then
 				f:Show()
+				-- 距离上次显示超过30秒时重置
+				if now - lastShown > 30 then
+					reset:Click()
+					lastShown = now
+				end
 				return
 			end
 		end
