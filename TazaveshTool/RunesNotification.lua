@@ -10,6 +10,7 @@ local iconString = "|T%s:16:16:0:0:64:64:5:59:5:59|t %s"
 local ticks = 0
 
 local triggerSpell = 346427 -- 触发法术
+local BOSS_ID = 2426 -- 希尔布兰德
 local width = 200
 local spacing, iconSpacing = 30, 1
 local slotWidth = 60
@@ -146,15 +147,15 @@ eventFrame:SetScript("OnEvent", function(_, event, arg1)
 		local instID = select(8, GetInstanceInfo())
 		if instID == 2441 then
 			eventFrame:RegisterEvent("ENCOUNTER_START")
+			eventFrame:RegisterEvent("ENCOUNTER_END")
 		else
 			eventFrame:UnregisterEvent("ENCOUNTER_START")
+			eventFrame:UnregisterEvent("ENCOUNTER_END")
 		end
-	elseif event == "ENCOUNTER_START" then
-		if arg1 == 2426 then -- 希尔布兰德
-			eventFrame:RegisterUnitEvent("UNIT_AURA", "player")
-		else
-			eventFrame:UnregisterEvent("UNIT_AURA")
-		end
+	elseif event == "ENCOUNTER_START" and arg1 == BOSS_ID then
+		eventFrame:RegisterUnitEvent("UNIT_AURA", "player")
+	elseif event == "ENCOUNTER_END" and arg1 == BOSS_ID then
+		eventFrame:UnregisterEvent("UNIT_AURA")
 	elseif event == "UNIT_AURA" then
 		f:Hide()
 
