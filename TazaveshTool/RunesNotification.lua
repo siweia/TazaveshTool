@@ -163,7 +163,7 @@ eventFrame:SetScript("OnEvent", function(_, event, arg1)
 
 		local now = GetTime()
 		for i = 1, 40 do
-			local name, _, _, _, _, _, _, _, _, spellID = UnitBuff("player", i)
+			local name, _, _, _, _, _, _, _, _, spellID = UnitDebuff("player", i)
 			if not name then break end
 			if spellID == TRIGGER_SPELL then
 				f:Show()
