@@ -5,7 +5,6 @@
 local texes = {1323035, 1323037, 1323038, 1323039}
 local direcs = {"↖", "↗", "↙", "↘"}
 local colors = {"蓝", "紫", "黄", "橙"}
-local orders = {1, 2, 4, 3}
 local iconString = "|T%s:16:16:0:0:64:64:5:59:5:59|t %s"
 local ticks = 0
 
@@ -122,22 +121,26 @@ reset:SetScript("OnClick", function()
 	ticks = 0
 end)
 
+local function GetSlotString(order)
+	local text = ""
+	for i = 1, 4 do
+		local icon = slots[order].icons[i].tex
+		if icon:GetAlpha() == 1 then
+			text = direcs[order]..colors[i]
+			break
+		end
+	end
+	return text
+end
+
 local send = CreateButton(f, slotWidth, 22, SEND_LABEL, 16)
 send:SetPoint("TOPRIGHT", f, "BOTTOMRIGHT", -10, 0)
 send:SetScript("OnClick", function()
 	if ticks < 3 then return end
 
-	local text = ""
-	for _, i in pairs(orders) do
-		for j = 1, 4 do
-			local icon = slots[i].icons[j].tex
-			if icon:GetAlpha() == 1 then
-				text = text..direcs[i]..colors[j].."   "
-				break
-			end
-		end
-	end
-	SendChatMessage(text, IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY")
+	local channel = IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
+	SendChatMessage(GetSlotString(1).."   "..GetSlotString(2), channel)
+	SendChatMessage(GetSlotString(3).."   "..GetSlotString(4), channel)
 end)
 
 local lastShown = 0
