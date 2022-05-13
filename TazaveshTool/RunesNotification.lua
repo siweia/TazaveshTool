@@ -87,7 +87,6 @@ local function clickIcon(self)
 		slots[self.index].icons[j].tex:SetAlpha(j ~= self.id and .2 or 1)
 		slots[self.index].icons[j].tex:SetDesaturated(j ~= self.id)
 	end
-	print(ticks)
 end
 
 local anchor = {
@@ -125,7 +124,6 @@ reset:SetScript("OnClick", function()
 			slots[i].icons[j].tex:SetDesaturated(false)
 		end
 	end
-	print(ticks)
 end)
 
 local function GetSlotString(order)
@@ -144,7 +142,6 @@ local send = CreateButton(f, slotWidth, 22, SEND_LABEL, 16)
 send:SetPoint("TOPRIGHT", f, "BOTTOMRIGHT", -10, 0)
 send:SetScript("OnClick", function()
 	if ticks < 3 then return end
-	print(ticks)
 
 	local channel = IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
 	SendChatMessage("------", channel)
@@ -204,5 +201,3 @@ end
 
 ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", ReplaceLocationString)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", ReplaceLocationString)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", ReplaceLocationString)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", ReplaceLocationString)
