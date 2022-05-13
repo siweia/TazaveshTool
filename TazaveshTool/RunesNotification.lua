@@ -5,7 +5,12 @@
 local texes = {1323035, 1323037, 1323038, 1323039}
 local direcs = {"↖", "↗", "↙", "↘"}
 local colors = {"蓝", "紫", "黄", "橙"}
-local iconString = "|T%s:16:16:0:0:64:64:5:59:5:59|t %s"
+local replaceColor = {
+	["蓝"] = "|cff2ac9ff蓝|r|T1323035:16:16:0:0:64:64:5:59:5:59|t",
+	["紫"] = "|cffff00ff紫|r|T1323037:16:16:0:0:64:64:5:59:5:59|t",
+	["黄"] = "|cffffff00黄|r|T1323038:16:16:0:0:64:64:5:59:5:59|t",
+	["橙"] = "|cffffa500橙|r|T1323039:16:16:0:0:64:64:5:59:5:59|t",
+}
 local ticks = 0
 
 local TRIGGER_SPELL = 346427 -- 触发法术
@@ -66,13 +71,14 @@ end
 local function showTooltip(icon)
 	GameTooltip:SetOwner(icon, "ANCHOR_TOP")
 	GameTooltip:ClearLines()
-	GameTooltip:AddLine(format(iconString, texes[icon.id], colors[icon.id]))
+	GameTooltip:AddLine(replaceColor[colors[icon.id]])
 	GameTooltip:Show()
 end
 
 local slots = {}
 
 local function clickIcon(self)
+	ticks = ticks + 1
 	for i = 1, 4 do
 		slots[i].icons[self.id].tex:SetAlpha(i ~= self.index and .2 or 1)
 		slots[i].icons[self.id].tex:SetDesaturated(i ~= self.index)
@@ -81,7 +87,7 @@ local function clickIcon(self)
 		slots[self.index].icons[j].tex:SetAlpha(j ~= self.id and .2 or 1)
 		slots[self.index].icons[j].tex:SetDesaturated(j ~= self.id)
 	end
-	ticks = ticks + 1
+	print(ticks)
 end
 
 local anchor = {
@@ -112,13 +118,14 @@ end
 local reset = CreateButton(f, slotWidth, 22, RESET, 16)
 reset:SetPoint("TOPLEFT", f, "BOTTOMLEFT", 10, 0)
 reset:SetScript("OnClick", function()
+	ticks = 0
 	for i = 1, 4 do
 		for j = 1, 4 do
 			slots[i].icons[j].tex:SetAlpha(1)
 			slots[i].icons[j].tex:SetDesaturated(false)
 		end
 	end
-	ticks = 0
+	print(ticks)
 end)
 
 local function GetSlotString(order)
@@ -137,8 +144,10 @@ local send = CreateButton(f, slotWidth, 22, SEND_LABEL, 16)
 send:SetPoint("TOPRIGHT", f, "BOTTOMRIGHT", -10, 0)
 send:SetScript("OnClick", function()
 	if ticks < 3 then return end
+	print(ticks)
 
 	local channel = IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
+	SendChatMessage("------", channel)
 	SendChatMessage(GetSlotString(1).."   "..GetSlotString(2), channel)
 	SendChatMessage(GetSlotString(3).."   "..GetSlotString(4), channel)
 end)
@@ -170,8 +179,8 @@ eventFrame:SetScript("OnEvent", function(_, event, arg1)
 			if not name then break end
 			if spellID == TRIGGER_SPELL then
 				f:Show()
-				-- 距离上次显示超过30秒时重置
-				if now - lastShown > 30 then
+				-- 距离上次显示超过15秒时重置
+				if now - lastShown > 15 then
 					reset:Click()
 					lastShown = now
 				end
@@ -180,3 +189,20 @@ eventFrame:SetScript("OnEvent", function(_, event, arg1)
 		end
 	end
 end)
+
+-- 将箭头+颜色的字符上色并添加图标
+local function replaceString(a, b, c, d, e)
+	b = replaceColor[b] or b
+	e = replaceColor[e] or e
+	return a..b..c..d..e
+end
+
+local function ReplaceLocationString(_, _, msg, ...)
+	msg = gsub(msg, "([↖↙]+)(.-)(%s+)([↗↘]+)(.-)$", replaceString)
+	return false, msg, ...
+end
+
+ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", ReplaceLocationString)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", ReplaceLocationString)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", ReplaceLocationString)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", ReplaceLocationString)
