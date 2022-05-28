@@ -144,9 +144,10 @@ send:SetScript("OnClick", function()
 	if ticks < 3 then return end
 
 	local channel = IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
-	SendChatMessage("------", channel)
+	SendChatMessage("--- 控制台 ---", channel)
 	SendChatMessage(GetSlotString(1).."   "..GetSlotString(2), channel)
 	SendChatMessage(GetSlotString(3).."   "..GetSlotString(4), channel)
+	SendChatMessage("--- 入门 ---", channel)
 end)
 
 local lastShown = 0
