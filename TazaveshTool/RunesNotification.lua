@@ -2,14 +2,25 @@
 -- 348451, 1323037 紫
 -- 348447, 1323038 黄
 -- 348437, 1323039 橙
+local locale = GetLocale()
+local BLUECC, PURPLECC, YELLOWCC, ORANGECC = "Blue", "Purple", "Yellow", "Orange"
+local DOORSTR, CONSOLESTR = "Door", "Console"
+if locale == "zhCN" then
+	BLUECC, PURPLECC, YELLOWCC, ORANGECC = "蓝", "紫", "黄", "橙"
+	DOORSTR, CONSOLESTR = "门口", "控制台"
+elseif locale == "zhTW" then
+	BLUECC, PURPLECC, YELLOWCC, ORANGECC = "藍", "紫", "黃", "橙"
+	DOORSTR, CONSOLESTR = "門口", "控制台"
+end
+
 local texes = {1323035, 1323037, 1323038, 1323039}
 local direcs = {"↖", "↗", "↙", "↘"}
-local colors = {"蓝", "紫", "黄", "橙"}
+local colors = {BLUECC, PURPLECC, YELLOWCC, ORANGECC}
 local replaceColor = {
-	["蓝"] = "|cff2ac9ff蓝|r|T1323035:16:16:0:0:64:64:5:59:5:59|t",
-	["紫"] = "|cffff00ff紫|r|T1323037:16:16:0:0:64:64:5:59:5:59|t",
-	["黄"] = "|cffffff00黄|r|T1323038:16:16:0:0:64:64:5:59:5:59|t",
-	["橙"] = "|cffffa500橙|r|T1323039:16:16:0:0:64:64:5:59:5:59|t",
+	[BLUECC] = "|cff2ac9ff"..BLUECC.."|r|T1323035:16:16:0:0:64:64:5:59:5:59|t",
+	[PURPLECC] = "|cffff00ff"..PURPLECC.."|r|T1323037:16:16:0:0:64:64:5:59:5:59|t",
+	[YELLOWCC] = "|cffffff00"..YELLOWCC.."|r|T1323038:16:16:0:0:64:64:5:59:5:59|t",
+	[ORANGECC] = "|cffffa500"..ORANGECC.."|r|T1323039:16:16:0:0:64:64:5:59:5:59|t",
 }
 
 local TRIGGER_SPELL = 346427 -- 触发法术
@@ -139,10 +150,10 @@ local send = CreateButton(f, slotWidth+10, 28, SEND_LABEL, 22)
 send:SetPoint("TOPRIGHT", f, "BOTTOMRIGHT", -10, 0)
 send:SetScript("OnClick", function()
 	local channel = IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
-	SendChatMessage("--- 控制台 ---", channel)
+	SendChatMessage("--- "..CONSOLESTR.." ---", channel)
 	SendChatMessage(GetSlotString(1).."   "..GetSlotString(2), channel)
 	SendChatMessage(GetSlotString(3).."   "..GetSlotString(4), channel)
-	SendChatMessage("--- 门口 ---", channel)
+	SendChatMessage("--- "..DOORSTR.." ---", channel)
 end)
 
 local lastShown = 0
