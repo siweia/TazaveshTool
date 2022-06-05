@@ -7,6 +7,8 @@ local NUMBER_DOTS_TEXTURE = "Interface\\Worldmap\\UI-QuestPoi-NumberIcons"
 local unitIDs = {"player", "party1", "party2", "party3", "party4"}
 local cache = {}
 
+local hasLocale = GetLocale() == "zhCN" -- 只在简中通报
+
 -- 商人坐标及属性
 local NUMBER_MAPS = {
 	[1] = {-35, 45, "外环左上角，裁缝商人。"},
@@ -89,6 +91,7 @@ local function AddNewNumber(parent, n)
 end
 
 local function onClick(bu)
+	if not hasLocale then return end
 	SendChatMessage(NUMBER_MAPS[bu.__idx][3], IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY")
 end
 
@@ -157,6 +160,7 @@ end)
 local notify = CreateFrame("Button", nil, f)
 notify:SetSize(25, 25)
 notify:SetPoint("LEFT", rotate, "RIGHT", 10, 0)
+notify:SetShown(hasLocale)
 notify.tex = notify:CreateTexture()
 notify.tex:SetAllPoints()
 notify.tex:SetTexture("Interface\\COMMON\\VOICECHAT-SPEAKER")
