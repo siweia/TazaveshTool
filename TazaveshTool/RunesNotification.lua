@@ -11,7 +11,6 @@ local replaceColor = {
 	["黄"] = "|cffffff00黄|r|T1323038:16:16:0:0:64:64:5:59:5:59|t",
 	["橙"] = "|cffffa500橙|r|T1323039:16:16:0:0:64:64:5:59:5:59|t",
 }
-local ticks = 0
 
 local TRIGGER_SPELL = 346427 -- 触发法术
 local BOSS_ID = 2426 -- 希尔布兰德
@@ -78,7 +77,6 @@ end
 local slots = {}
 
 local function clickIcon(self)
-	ticks = ticks + 1
 	for i = 1, 4 do
 		slots[i].icons[self.id].tex:SetAlpha(i ~= self.index and .2 or 1)
 		slots[i].icons[self.id].tex:SetDesaturated(i ~= self.index)
@@ -114,10 +112,9 @@ for i = 1, 4 do
 	end
 end
 
-local reset = CreateButton(f, slotWidth, 22, RESET, 16)
+local reset = CreateButton(f, slotWidth+10, 28, RESET, 22)
 reset:SetPoint("TOPLEFT", f, "BOTTOMLEFT", 10, 0)
 reset:SetScript("OnClick", function()
-	ticks = 0
 	for i = 1, 4 do
 		for j = 1, 4 do
 			slots[i].icons[j].tex:SetAlpha(1)
@@ -138,16 +135,14 @@ local function GetSlotString(order)
 	return text
 end
 
-local send = CreateButton(f, slotWidth, 22, SEND_LABEL, 16)
+local send = CreateButton(f, slotWidth+10, 28, SEND_LABEL, 22)
 send:SetPoint("TOPRIGHT", f, "BOTTOMRIGHT", -10, 0)
 send:SetScript("OnClick", function()
-	if ticks < 3 then return end
-
 	local channel = IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY"
 	SendChatMessage("--- 控制台 ---", channel)
 	SendChatMessage(GetSlotString(1).."   "..GetSlotString(2), channel)
 	SendChatMessage(GetSlotString(3).."   "..GetSlotString(4), channel)
-	SendChatMessage("--- 入门 ---", channel)
+	SendChatMessage("--- 门口 ---", channel)
 end)
 
 local lastShown = 0
