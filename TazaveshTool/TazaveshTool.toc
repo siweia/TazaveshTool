@@ -1,8 +1,8 @@
-## Interface: 90200
+## Interface: 90205
 ## Title: |cff0080ffTazaveshTool|r
-## Title-zhCN: |cff0080ffTazaveshTool|r 集市交易助手
+## Title-zhCN: |cff0080ffTazaveshTool|r 集市交易助手v9
 ## Author: Siweia
-## Version: 8
+## Version: 9
 ## X-Support: SL
 ## SavedVariables: TTdb
 ## X-Website: https://github.com/siweia/TazaveshTool
